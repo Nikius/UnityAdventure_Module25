@@ -4,9 +4,5 @@
     {
         void OnMoveStarted();
         void OnMoveComplete();
-
-        void OnHit();
-
-        void OnDead();
     }
 }

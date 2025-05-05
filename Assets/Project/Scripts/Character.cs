@@ -18,7 +18,6 @@ namespace Project.Scripts
 
         private void Awake()
         {
-            // _rigidbody = GetComponent<Rigidbody>();
             _characterAnimator = new CharacterAnimator(_animator);
             _mover = new MoveAgent(GetComponent<NavMeshAgent>(), _characterAnimator, _destinationPointPrefab);
             _inputController = new InputController(_mover);
@@ -35,16 +34,7 @@ namespace Project.Scripts
         public void OnBlow(Vector3 position, float power)
         {
             _health.TakeDamage(power);
-            
-            // PushAway(position, power);
         }
-        
-        // private void PushAway(Vector3 position, float power)
-        // {
-        //     Vector3 direction = transform.position - position;
-        //     Vector3 force = direction.normalized * 1 / direction.magnitude * power;
-        //     _rigidbody.AddForce(force, ForceMode.Impulse);
-        // }
         
         public void OnInjured()
         {
