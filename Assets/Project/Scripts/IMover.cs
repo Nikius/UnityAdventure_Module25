@@ -6,6 +6,7 @@ namespace Project.Scripts
     {
         void Update();
         void MoveTo(Vector3 targetPosition);
+        bool IsMoving();
         void SetLowSpeed();
         void Stop();
     }

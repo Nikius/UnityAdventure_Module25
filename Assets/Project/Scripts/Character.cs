@@ -12,23 +12,23 @@ namespace Project.Scripts
 
         private Rigidbody _rigidbody;
         private CharacterAnimator _characterAnimator;
-        private InputController _inputController;
         private IMover _mover;
         private Health _health;
+        
+        private bool _isDead;
 
         private void Awake()
         {
             _characterAnimator = new CharacterAnimator(_animator);
             _mover = new MoveAgent(GetComponent<NavMeshAgent>(), _characterAnimator, _destinationPointPrefab);
-            _inputController = new InputController(_mover);
 
             IDamageEvents[] listeners = { _characterAnimator, this }; 
             _health = new Health(listeners, _maxHealth);
         }
 
-        private void Update()
+        public void Update()
         {
-            _inputController.Update();
+            _mover.Update();
         }
 
         public void OnBlow(Vector3 position, float power)
@@ -49,6 +49,18 @@ namespace Project.Scripts
         public void OnDead()
         {
             _mover.Stop();
+            _isDead = true;
+        }
+
+        public void SetMoveTarget(Vector3 target)
+        {
+            if (_isDead == false)
+                _mover.MoveTo(target);
+        }
+
+        public bool IsMoving()
+        {
+            return _mover.IsMoving();
         }
     }
 }

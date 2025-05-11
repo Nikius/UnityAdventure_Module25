@@ -1,28 +1,21 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Project.Scripts
 {
-    public class InputController
+    public class PlayerCharacterController: Controller
     {
         private const int LeftMouseButtonKey = 0;
 
         private readonly Camera _camera;
-        private readonly IMover _mover;
-        
-        public InputController(IMover mover)
+        private readonly Character _character;
+
+        public PlayerCharacterController(Character character)
         {
+            _character = character;
             _camera = Camera.main;
-            _mover = mover;
         }
 
-        public void Update()
-        {
-            ProcessMouseInput();
-            
-            _mover.Update();
-        }
-
-        private void ProcessMouseInput()
+        protected override void UpdateLogic()
         {
             if (!Input.GetMouseButtonDown(LeftMouseButtonKey))
                 return;
@@ -31,8 +24,8 @@ namespace Project.Scripts
                 
             if (!Physics.Raycast(ray, out RaycastHit hit))
                 return;
-                
-            _mover.MoveTo(hit.point);
+            
+            _character.SetMoveTarget(hit.point);
         }
     }
 }

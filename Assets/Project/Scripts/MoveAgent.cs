@@ -49,6 +49,8 @@ namespace Project.Scripts
 
         }
 
+        public bool IsMoving() => _isMoving;
+
         public void SetLowSpeed()
         {
             _agent.speed *= 0.5f;
