@@ -10,10 +10,13 @@ namespace Project.Scripts
 
         private float _timer;
         private bool _isActivated;
+        
+        private MineView _mineView;
 
         private void Awake()
         {
             _timer = _timeToBlow;
+            _mineView = new MineView(_blowVFXPrefab);
         }
 
         private void Update()
@@ -61,18 +64,11 @@ namespace Project.Scripts
                     objectBlowable.OnBlow(transform.position, _blowStrength);
             }
         }
-
+        
         private void BlowMine()
         {
-            ShowBlowVFX(transform.position);
+            _mineView.ShowBlowVFX(transform.position);
             Destroy(gameObject);
-        }
-
-        private void ShowBlowVFX(Vector3 position)
-        {
-            ParticleSystem blowVFX = Instantiate(_blowVFXPrefab, position, Quaternion.identity);
-            blowVFX.Play();
-            Destroy(blowVFX.gameObject, blowVFX.main.duration);
         }
     }
 }
