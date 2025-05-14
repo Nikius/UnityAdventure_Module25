@@ -9,18 +9,29 @@ namespace Project.Scripts
         [SerializeField] private GameObject _destinationPointPrefab;
         [SerializeField] private Animator _animator;
         [SerializeField] private float _maxHealth;
+        [SerializeField] private float _jumpSpeed;
+        [SerializeField] private float _rotationSpeed;
+        [SerializeField] private AnimationCurve _jumpCurve;
 
         private Rigidbody _rigidbody;
         private CharacterAnimator _characterAnimator;
+        private NavMeshAgent _agent;
         private IMover _mover;
+        private IJumper _jumper;
+        private Rotator _rotator;
         private Health _health;
         
         private bool _isDead;
+        
+        public bool InJumpProcess => _jumper.IsInProcess();
 
         private void Awake()
         {
+            _agent = GetComponent<NavMeshAgent>();
             _characterAnimator = new CharacterAnimator(_animator);
-            _mover = new MoveAgent(GetComponent<NavMeshAgent>(), _characterAnimator, _destinationPointPrefab);
+            _mover = new MoverAgent(_agent, _characterAnimator, _destinationPointPrefab);
+            _jumper = new JumperAgent(_jumpSpeed, _agent, this, _jumpCurve, _characterAnimator);
+            _rotator = new Rotator(_rotationSpeed, transform);
 
             IDamageEvents[] listeners = { _characterAnimator, this }; 
             _health = new Health(listeners, _maxHealth);
@@ -29,6 +40,9 @@ namespace Project.Scripts
         public void Update()
         {
             _mover.Update();
+            
+            if (InJumpProcess)
+                _rotator.Update();
         }
 
         public void OnBlow(Vector3 position, float power)
@@ -58,9 +72,30 @@ namespace Project.Scripts
                 _mover.MoveTo(target);
         }
 
+        public void SetRotationDirection(Vector3 direction)
+        {
+            _rotator.SetDirection(direction);
+        }
+
         public bool IsMoving()
         {
             return _mover.IsMoving();
         }
+
+        public bool IsOnNavMeshLink(out OffMeshLinkData offMeshLinkData)
+        {
+            if (_agent.isOnOffMeshLink)
+            {
+                offMeshLinkData = _agent.currentOffMeshLinkData;
+            
+                return true;
+            }
+            
+            offMeshLinkData = default;
+            
+            return false;
+        }
+        
+        public void Jump(OffMeshLinkData offMeshLinkData) => _jumper.Jump(offMeshLinkData);
     }
 }

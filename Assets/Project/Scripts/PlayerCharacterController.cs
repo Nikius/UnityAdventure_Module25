@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.EventSystems;
 
 namespace Project.Scripts
 {
@@ -17,9 +19,18 @@ namespace Project.Scripts
 
         protected override void UpdateLogic()
         {
-            if (!Input.GetMouseButtonDown(LeftMouseButtonKey))
-                return;
-            
+            if (Input.GetMouseButtonDown(LeftMouseButtonKey) && EventSystem.current.IsPointerOverGameObject() == false)
+                SetMoveTargetByMouse();
+
+            if (_character.IsOnNavMeshLink(out OffMeshLinkData offMeshLinkData) && _character.InJumpProcess == false)
+            {
+                _character.SetRotationDirection(offMeshLinkData.endPos - offMeshLinkData.startPos);
+                _character.Jump(offMeshLinkData);
+            }
+        }
+
+        private void SetMoveTargetByMouse()
+        {
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
                 
             if (!Physics.Raycast(ray, out RaycastHit hit))

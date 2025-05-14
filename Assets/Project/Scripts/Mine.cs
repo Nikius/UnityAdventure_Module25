@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace Project.Scripts
 {
@@ -7,34 +8,41 @@ namespace Project.Scripts
         [SerializeField] private float _blowStrength;
         [SerializeField] private float _timeToBlow;
         [SerializeField] private ParticleSystem _blowVFXPrefab;
+        [SerializeField] private AudioSource _audioSource;
 
-        private float _timer;
         private bool _isActivated;
         
         private MineView _mineView;
+        private MineSFX _mineSFX;
+        private MeshRenderer _meshRenderer;
 
         private void Awake()
         {
-            _timer = _timeToBlow;
             _mineView = new MineView(_blowVFXPrefab);
+            _mineSFX = new MineSFX(_audioSource);
+            _meshRenderer = GetComponent<MeshRenderer>();
         }
 
         private void Update()
         {
-            if (_isActivated == false)
+            if (_isActivated)
+                return;
+            
+            if (ShouldActivate())
             {
-                _isActivated = ShouldActivate();
+                StartCoroutine(BlowProcess());
+                _isActivated = true;
             }
-            else
-            {
-                _timer -= Time.deltaTime;
+        }
 
-                if (_timer <= 0)
-                {
-                    BlowNearObjects();
-                    BlowMine();
-                }
-            }
+        private IEnumerator BlowProcess()
+        {
+            yield return new WaitForSeconds(_timeToBlow);
+            
+            BlowNearObjects();
+            BlowMine();
+
+            yield return null;
         }
 
         private bool ShouldActivate()
@@ -67,8 +75,10 @@ namespace Project.Scripts
         
         private void BlowMine()
         {
+            _meshRenderer.enabled = false;
             _mineView.ShowBlowVFX(transform.position);
-            Destroy(gameObject);
+            _mineSFX.PlayBoom();
+            Destroy(gameObject, _audioSource.clip.length);
         }
     }
 }
