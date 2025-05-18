@@ -8,10 +8,11 @@ namespace Project.Scripts
     {
         [SerializeField] private GameObject _destinationPointPrefab;
         [SerializeField] private Animator _animator;
+        [SerializeField] private AnimationCurve _jumpCurve;
         [SerializeField] private float _maxHealth;
         [SerializeField] private float _jumpSpeed;
         [SerializeField] private float _rotationSpeed;
-        [SerializeField] private AnimationCurve _jumpCurve;
+        [SerializeField] private CharacterView _characterView;
 
         private Rigidbody _rigidbody;
         private CharacterAnimator _characterAnimator;
@@ -33,7 +34,7 @@ namespace Project.Scripts
             _jumper = new JumperAgent(_jumpSpeed, _agent, this, _jumpCurve, _characterAnimator);
             _rotator = new Rotator(_rotationSpeed, transform);
 
-            IDamageEvents[] listeners = { _characterAnimator, this }; 
+            IDamageEvents[] listeners = { _characterAnimator, this, _characterView }; 
             _health = new Health(listeners, _maxHealth);
         }
 

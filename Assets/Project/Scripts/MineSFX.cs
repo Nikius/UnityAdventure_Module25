@@ -2,16 +2,26 @@
 
 namespace Project.Scripts
 {
-    public class MineSFX
+    public class MineSFX: MonoBehaviour, IBlowProgress
     {
-        private readonly AudioSource _audioSource;
+        private AudioSource _audioSource;
 
-        public MineSFX(AudioSource audioSource)
+        private void Awake()
         {
-            _audioSource = audioSource;
+            _audioSource = GetComponent<AudioSource>();
         }
 
-        public void PlayBoom()
+        public void OnActivated()
+        {
+            //
+        }
+
+        public void OnBlown()
+        {
+            PlayBoom();
+        }
+        
+        private void PlayBoom()
         {
             AudioClip audioClip = _audioSource.clip;
             _audioSource.PlayOneShot(audioClip);

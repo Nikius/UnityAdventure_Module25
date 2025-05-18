@@ -1,9 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace Project.Scripts
 {
     public class CharacterAnimator: IMoveEvents, IDamageEvents, IJumpEvents
     {
+        
         private const float MinWeight = 0f;
         private const float MaxWeight = 1f;
         
@@ -20,7 +22,7 @@ namespace Project.Scripts
         public CharacterAnimator(Animator animator)
         {
             _animator = animator;
-            
+
             _animator.SetLayerWeight(BaseLayerKey, MaxWeight);
             _animator.SetLayerWeight(InjuredLayerKey, MinWeight);
         }

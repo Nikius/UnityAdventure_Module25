@@ -1,26 +1,27 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Project.Scripts
 {
     public class Mine: Enemy
     {
+        private const float WaitUntilDestroy = 5f;
+        
         [SerializeField] private float _blowStrength;
         [SerializeField] private float _timeToBlow;
-        [SerializeField] private ParticleSystem _blowVFXPrefab;
-        [SerializeField] private AudioSource _audioSource;
+        
+        [SerializeField] private MineSFX _mineSFX;
+        [SerializeField] private MineView _mineView;
 
         private bool _isActivated;
         
-        private MineView _mineView;
-        private MineSFX _mineSFX;
-        private MeshRenderer _meshRenderer;
+        private readonly List<IBlowProgress> _listeners = new();
 
         private void Awake()
         {
-            _mineView = new MineView(_blowVFXPrefab);
-            _mineSFX = new MineSFX(_audioSource);
-            _meshRenderer = GetComponent<MeshRenderer>();
+            _listeners.Add(_mineView);
+            _listeners.Add(_mineSFX);
         }
 
         private void Update()
@@ -37,6 +38,9 @@ namespace Project.Scripts
 
         private IEnumerator BlowProcess()
         {
+            foreach (IBlowProgress listener in _listeners)
+                listener.OnActivated();
+            
             yield return new WaitForSeconds(_timeToBlow);
             
             BlowNearObjects();
@@ -75,10 +79,10 @@ namespace Project.Scripts
         
         private void BlowMine()
         {
-            _meshRenderer.enabled = false;
-            _mineView.ShowBlowVFX(transform.position);
-            _mineSFX.PlayBoom();
-            Destroy(gameObject, _audioSource.clip.length);
+            foreach (IBlowProgress listener in _listeners)
+                listener.OnBlown();
+            
+            Destroy(gameObject, WaitUntilDestroy);
         }
     }
 }
